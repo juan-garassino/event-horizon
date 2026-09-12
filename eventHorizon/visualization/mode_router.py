@@ -712,12 +712,17 @@ class LuminetPointsHandler(VisualizationHandler):
                 g_flux_norm = ((visible_ghost['flux_o'].abs() + min_flux) / (max_flux + min_flux)).values ** power_scale if 'flux_o' in visible_ghost.columns else np.full(len(visible_ghost), 0.5)
                 g_sizes = dot_size * (0.3 + 1.5 * np.clip(g_flux_norm, 0, 1))
 
+                # NOTE: ghost Y is NOT negated here. The odd-order (ghost) image is
+                # already flipped inside the geodesic solver (alpha += pi before
+                # solving eq.13, matching the bgmeulem/luminet reference
+                # solve_for_impact_parameter). Plotting at -Y would flip a second
+                # time and render the ghost upside-down. One flip, at solve time.
                 if use_white:
-                    ax.scatter(visible_ghost['X'].values, -visible_ghost['Y'].values,
+                    ax.scatter(visible_ghost['X'].values, visible_ghost['Y'].values,
                               c='white', s=g_sizes, alpha=g_flux_norm * 0.5,
                               edgecolors='none', zorder=1)
                 else:
-                    ax.scatter(visible_ghost['X'].values, -visible_ghost['Y'].values,
+                    ax.scatter(visible_ghost['X'].values, visible_ghost['Y'].values,
                               c=g_flux_norm, cmap=cmap, s=g_sizes,
                               alpha=0.6, edgecolors='none', zorder=1)
 
@@ -788,16 +793,20 @@ class ScatterHandler(LuminetPointsHandler):
 
         print(f"Generated {len(direct_df)} direct and {len(ghost_df)} ghost particles")
 
-        # Populate export_data for plotter export (vectorized)
+        # Populate export_data for plotter export (vectorized).
+        # Both direct and ghost use their stored Y as-is: the ghost image is
+        # already flipped inside the geodesic solver (alpha += pi before eq.13,
+        # matching the bgmeulem/luminet reference). Negating Y here would flip a
+        # second time and desync the exported plot from the rendered scatter.
         all_x, all_y, all_intens = [], [], []
         show_ghost = self.params.get('show_ghost_image', True)
-        for df, y_flip in [(direct_df, False), (ghost_df, True)]:
+        for df, is_ghost in [(direct_df, False), (ghost_df, True)]:
             if df is None or df.empty:
                 continue
-            if y_flip and not show_ghost:
+            if is_ghost and not show_ghost:
                 continue
             xs = df['X'].values
-            ys = -df['Y'].values if y_flip else df['Y'].values
+            ys = df['Y'].values
             if max_flux > 0:
                 intens = np.clip((df['flux_o'].values / max_flux) ** power_scale, 0, 1)
             else:

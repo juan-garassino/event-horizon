@@ -413,15 +413,20 @@ class LuminetPointsHandler(VisualizationHandler):
                 )
                 g_sizes = dot_size * (0.3 + 1.5 * np.clip(g_flux_norm, 0, 1))
 
+                # NOTE: ghost Y is NOT negated here. The odd-order (ghost) image is
+                # already flipped inside the geodesic solver (alpha += pi before
+                # solving eq.13, matching the bgmeulem/luminet reference
+                # solve_for_impact_parameter). Plotting at -Y would flip a second
+                # time and render the ghost upside-down. One flip, at solve time.
                 if use_white:
                     ax.scatter(
-                        visible_ghost['X'].values, -visible_ghost['Y'].values,
+                        visible_ghost['X'].values, visible_ghost['Y'].values,
                         c='white', s=g_sizes, alpha=g_flux_norm * 0.5,
                         edgecolors='none', zorder=1,
                     )
                 else:
                     ax.scatter(
-                        visible_ghost['X'].values, -visible_ghost['Y'].values,
+                        visible_ghost['X'].values, visible_ghost['Y'].values,
                         c=g_flux_norm, cmap=cmap, s=g_sizes,
                         alpha=0.6, edgecolors='none', zorder=1,
                     )
