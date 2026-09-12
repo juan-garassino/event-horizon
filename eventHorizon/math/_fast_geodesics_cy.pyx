@@ -209,7 +209,18 @@ cdef double c_solve_impact_parameter(
     if 3.0 * r > max_p:
         max_p = 3.0 * r
 
-    gamma = acos(c_cos_gamma(alpha, incl))
+    # For odd-order (ghost) images the observer-frame angle is flipped by pi
+    # before solving eq.13 (Luminet 1979; matches solve_for_impact_parameter in
+    # the bgmeulem/luminet reference). Without this the ghost periastron is wrong.
+    cdef double alpha_solve = alpha
+    if n % 2 == 1:
+        alpha_solve = alpha + M_PI
+        # reduce into [0, 2pi)
+        alpha_solve = alpha_solve - 2.0 * M_PI * <int>(alpha_solve / (2.0 * M_PI))
+        if alpha_solve < 0.0:
+            alpha_solve = alpha_solve + 2.0 * M_PI
+
+    gamma = acos(c_cos_gamma(alpha_solve, incl))
 
     dp = (max_p - min_p) / <double>n_scan
     prev_val = c_eq13(min_p, r, gamma, M, n)

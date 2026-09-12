@@ -121,10 +121,12 @@ class SpacetimeGeometry:
             log_arg = ((np.sqrt(r_normalized) + np.sqrt(3)) * (np.sqrt(6) - np.sqrt(3))) / \
                       ((np.sqrt(r_normalized) - np.sqrt(3)) * (np.sqrt(6) + np.sqrt(3)))
             
+            # Page & Thorne (1974) eq.15n: log-term factor is sqrt(3)/2.
+            # Luminet (1979) eq.15 has a typo (sqrt(3)/3 == 1/sqrt(3)); use sqrt(3)/2.
             flux = (3.0 * self.mass * accretion_rate / (8 * np.pi)) * \
                    (1 / ((r_normalized - 3) * radius ** 2.5)) * \
-                   (np.sqrt(r_normalized) - np.sqrt(6) + 
-                    (1.0 / np.sqrt(3)) * np.log(log_arg))
+                   (np.sqrt(r_normalized) - np.sqrt(6) +
+                    (np.sqrt(3) / 2.0) * np.log(log_arg))
             
             return max(flux, 0.0)
         except (ValueError, ZeroDivisionError, OverflowError):

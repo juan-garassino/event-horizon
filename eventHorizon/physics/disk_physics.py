@@ -46,9 +46,11 @@ def flux_intrinsic(r: float, accretion_rate: float, mass: float) -> float:
         if log_den <= 0 or log_num <= 0:
             return 0.0
         log_arg = log_num / log_den
+        # Page & Thorne (1974) eq.15n: log-term factor is sqrt(3)/2.
+        # Luminet (1979) eq.15 has a typo (sqrt(3)/3 == 1/sqrt(3)); use sqrt(3)/2.
         f = (3.0 * mass * accretion_rate / (8.0 * np.pi)) * \
             (1.0 / ((r_ - 3.0) * r ** 2.5)) * \
-            (np.sqrt(r_) - np.sqrt(6) + (1.0 / np.sqrt(3)) * np.log(log_arg))
+            (np.sqrt(r_) - np.sqrt(6) + (np.sqrt(3) / 2.0) * np.log(log_arg))
         return max(f, 0.0)
     except Exception:
         return 0.0
@@ -144,6 +146,13 @@ def calc_impact_parameter_exact(r: float, alpha: float, incl: float,
         Impact parameter, or None if no solution found
     """
     try:
+        # For odd-order (ghost) images the observer-frame angle is flipped by pi
+        # before solving eq.13 (Luminet 1979; matches solve_for_impact_parameter
+        # in the bgmeulem/luminet reference). Without this the ghost impact
+        # parameter is the mirror (wrong) value.
+        if n % 2 == 1:
+            alpha = (alpha + np.pi) % (2 * np.pi)
+
         min_p = 3.01 * mass
         max_p = max(100.0 * mass, 3.0 * r)
 
@@ -153,7 +162,12 @@ def calc_impact_parameter_exact(r: float, alpha: float, incl: float,
         sign_changes = np.where(np.diff(np.sign(eq13_values)))[0]
 
         if len(sign_changes) == 0:
-            return ellipse_fallback(r, alpha, incl)
+            # No periastron solution. Following the reference, only order-0
+            # photons in the front half of the disk (alpha in front half) are
+            # interpolated by the Newtonian ellipse; everything else is absorbed.
+            if n == 0 and ((alpha < np.pi / 2) or (alpha > 3 * np.pi / 2)):
+                return ellipse_fallback(r, alpha, incl)
+            return None
 
         idx = sign_changes[0]
         p_low = p_values[idx]

@@ -107,7 +107,7 @@ def expr_ellipse() -> sy.Symbol:
 
 def expr_fs() -> sy.Symbol:
     """Generate an expression for the intrinsic flux of an accretion disk.
-    
+
     This represents the standard Shakura-Sunyaev disk model flux profile.
     """
     m, rstar, mdot = sy.symbols(r"M, r^*, \dot{m}")
@@ -117,7 +117,9 @@ def expr_fs() -> sy.Symbol:
         * (
             sy.sqrt(rstar)
             - sy.sqrt(6)
-            + (sy.sqrt(3) / 3)
+            # Page & Thorne (1974) eq.15n: the log-term factor is sqrt(3)/2.
+            # Luminet (1979) eq.15 has a typo (sqrt(3)/3); use the correct value.
+            + (sy.sqrt(3) / 2)
             * sy.ln(
                 ((sy.sqrt(rstar) + sy.sqrt(3)) * (sy.sqrt(6) - sy.sqrt(3)))
                 / ((sy.sqrt(rstar) - sy.sqrt(3)) * (sy.sqrt(6) + sy.sqrt(3)))
@@ -303,14 +305,20 @@ def impact_parameter(
     ellipse = lambdify(["r", "alpha", "theta_0"], expr_ellipse())
     b = lambdify(["P", "M"], expr_b())
 
+    # For odd-order (ghost) images the observer-frame angle is flipped by pi
+    # before solving eq.13 (Luminet 1979; see solve_for_impact_parameter in the
+    # bgmeulem/luminet reference). Without this flip the ghost periastron solved
+    # here is wrong (mirror of the correct value).
+    alpha_solve = (np.asarray(alpha) + np.pi) % (2 * np.pi) if (n % 2 == 1) else alpha
+
     p_arr = fast_root(
         objective_func,
         np.linspace(2.1, 50, 1000),
-        alpha,
+        alpha_solve,
         (theta_0, r_value, n, m),
         **root_kwargs
     )
-    return np.where(np.isnan(p_arr), ellipse(r_value, alpha, theta_0), b(p_arr, m))
+    return np.where(np.isnan(p_arr), ellipse(r_value, alpha_solve, theta_0), b(p_arr, m))
 
 
 def simulate_flux(

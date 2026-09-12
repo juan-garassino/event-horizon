@@ -63,9 +63,11 @@ def flux_intrinsic_vec(r: np.ndarray, mass: float,
         log_den = (sqrt_r - sqrt3) * (sqrt6 + sqrt3)
         log_term = np.log(np.abs(log_num / log_den))
 
+        # Page & Thorne (1974) eq.15n: log-term factor is sqrt(3)/2.
+        # Luminet (1979) eq.15 has a typo (sqrt(3)/3 == 1/sqrt(3)); use sqrt(3)/2.
         f = ((3.0 * mass * accretion_rate) / (8.0 * np.pi) *
              (1.0 / ((r_ - 3.0) * r ** 2.5)) *
-             (sqrt_r - sqrt6 + (1.0 / sqrt3) * log_term))
+             (sqrt_r - sqrt6 + (sqrt3 / 2.0) * log_term))
 
     return np.where((r_ > 6.0) & np.isfinite(f) & (f > 0), f, 0.0)
 
