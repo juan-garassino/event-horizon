@@ -92,3 +92,9 @@ the code together interactively.
 
 ## File structure
 [ Fill in: e.g. "geodesic.py has the ray tracing, disk.py has the brightness math" ]
+
+## Branches
+The `lacague` branch is an incomplete OO refactor (stubbed physics) — archived, not
+merged. The production-grade exact Luminet solver lives embedded in PromptPlot
+(`promptplot/generative/generators.py`); porting it into a clean `eventHorizon/math`
+module is a tracked follow-up.
