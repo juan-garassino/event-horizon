@@ -1,6 +1,18 @@
 # Python bytecode files
 __pycache__/
 *.py[cod]
+*.pyc
+*.pyo
+
+# Compiled extensions
+*.so
+
+# Packaging artifacts
+*.egg-info/
+build/
+
+# macOS metadata
+.DS_Store
 
 # Jupyter notebook checkpoints
 .ipynb_checkpoints/
