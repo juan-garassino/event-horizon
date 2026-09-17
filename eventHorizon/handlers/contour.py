@@ -123,30 +123,19 @@ class LuminetPointsHandler(VisualizationHandler):
         else:
             fluxes = np.ones(len(points_filtered))
 
-        # Clip direct tricontourf above the silhouette bottom so it doesn't
-        # paint dark fill over the ghost image below.
-        critical_b = np.sqrt(27.0) * self.mass
-        clip_rect = plt.Rectangle(
-            (-200, -critical_b), 400, 400,
-            transform=ax.transData, visible=False,
-        )
-        ax.add_patch(clip_rect)
-
         try:
-            tcf = ax.tricontourf(
+            ax.tricontourf(
                 points_filtered['X'].values, points_filtered['Y'].values, fluxes,
                 cmap='Greys_r', levels=levels,
-                norm=plt.Normalize(0, 1), nchunk=2, zorder=2,
+                norm=plt.Normalize(0, 1), nchunk=2,
             )
-            for col in tcf.collections:
-                col.set_clip_path(clip_rect)
         except Exception:
             ax.scatter(
                 points_filtered['X'], points_filtered['Y'],
-                c=fluxes, cmap='Greys_r', s=1, alpha=0.7, zorder=2,
+                c=fluxes, cmap='Greys_r', s=1, alpha=0.7,
             )
 
-        self._add_inner_disk_edge_fill(ax, zorder=3)
+        self._add_inner_disk_edge_fill(ax, zorder=1)
         return ax
 
     def _plot_ghost_image_original(
@@ -181,14 +170,6 @@ class LuminetPointsHandler(VisualizationHandler):
         points_inner = points_df[mask_inner]
         points_outer = points_df[mask_outer]
 
-        # Clip for ghost inner: only show below y=0 so artifacts in
-        # the shadow region are hidden but the ghost ring is visible.
-        ghost_clip = plt.Rectangle(
-            (-200, -200), 400, 200,
-            transform=ax.transData, visible=False,
-        )
-        ax.add_patch(ghost_clip)
-
         for i, points_ in enumerate([points_inner, points_outer]):
             if points_.empty:
                 continue
@@ -199,18 +180,14 @@ class LuminetPointsHandler(VisualizationHandler):
             else:
                 fluxes = np.full(len(points_), 0.5)
 
-            # Ghost inner (i=0) at zorder=4, clipped to y<0
-            # Ghost outer (i=1) at zorder=0
-            z = 4 if i == 0 else 0
+            # Ghost inner (i=0) at zorder=1, ghost outer (i=1) at zorder=0
+            z = 1 - i
             try:
-                tcf = ax.tricontourf(
+                ax.tricontourf(
                     points_['X'].values, -points_['Y'].values, fluxes,
                     cmap='Greys_r', norm=plt.Normalize(0, 1), levels=levels,
                     nchunk=2, zorder=z,
                 )
-                if i == 0:
-                    for col in tcf.collections:
-                        col.set_clip_path(ghost_clip)
             except Exception:
                 ax.scatter(
                     points_['X'].values, -points_['Y'].values,

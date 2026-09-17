@@ -1,0 +1,10 @@
+{
+  "started_at": "2026-03-28T13:33:37.134014",
+  "completed_at": "2026-03-28T13:34:14.590467",
+  "duration_seconds": 37.456453,
+  "params": {
+    "test": true
+  },
+  "files": [],
+  "status": "completed"
+}

@@ -1,0 +1,19 @@
+{
+  "started_at": "2026-03-28T13:38:40.969734",
+  "completed_at": "2026-03-28T13:39:54.809069",
+  "duration_seconds": 73.839335,
+  "params": {
+    "mass": 1.0,
+    "inclination": 80.0,
+    "particle_count": 500,
+    "power_scale": 0.9,
+    "levels": 20,
+    "quality": "draft"
+  },
+  "files": [
+    "results/20260328_133840/luminet/contour_i80.0_N500.png",
+    "results/20260328_133840/scatter/scatter_i80.0_N500.png",
+    "results/20260328_133840/isoradials/isoradials_i80.0.png"
+  ],
+  "status": "completed"
+}

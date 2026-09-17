@@ -1,0 +1,17 @@
+{
+  "started_at": "2026-03-28T13:34:31.377336",
+  "completed_at": "2026-03-28T13:34:38.962368",
+  "duration_seconds": 7.585032,
+  "params": {
+    "mass": 1.0,
+    "inclination": 80.0,
+    "particle_count": 500,
+    "power_scale": 0.9,
+    "levels": 100,
+    "quality": "standard"
+  },
+  "files": [
+    "results/20260328_133431/scatter/scatter_i80.0_N500.png"
+  ],
+  "status": "completed"
+}
