@@ -1,0 +1,15 @@
+[project]
+name = "eventhorizon"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+  "numpy>=1.22",
+  "scipy>=1.9",
+  "matplotlib>=3.5",
+  "pandas>=1.4",
+  "sympy>=1.10",
+  "rich>=12.0",
+  "pyfiglet>=0.8",]
+
+[tool.uv]
+package = false
