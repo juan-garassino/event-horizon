@@ -521,6 +521,15 @@ def validate_bhsim_reference():
 validate_bhsim_reference()
 ```
 
+### 3. Reference-value tests from Luminet's figures (open)
+
+Most physics checks above compare against analytic identities or only assert type and sign. Still
+missing: pytest regression tests that pin numbers read off Luminet's (1979) figures — e.g. apparent
+isoradial sizes `b(α)` at 80° inclination and the `1 + z` range along the inner (r = 6M) isoradial —
+with a tolerance that reflects digitizing a printed plot. Add them only once the formulas they exercise
+are confirmed. If a function under test is wrapped in `functools.lru_cache`, call its `.cache_clear()`
+in a fixture so a cached result from another test cannot bypass a monkeypatch or a changed parameter.
+
 ## Visual Validation
 
 ### 1. Qualitative Comparison
