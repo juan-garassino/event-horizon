@@ -134,8 +134,8 @@ class Isoradial(BaseModel):
         
         # Use the enhanced impact parameter calculation
         physics_engine = self._get_physics_engine()
-        return physics_engine.calc_impact_parameter(
-            radius, inclination_rad, angle, image_order
+        return physics_engine.calculate_impact_parameter(
+            angle, radius, inclination_rad, image_order
         )
     
     def calculate_coordinates(self, angular_precision: int = 100, **kwargs):
@@ -163,7 +163,7 @@ class Isoradial(BaseModel):
         
         for angle, impact_param in zip(self.angles, self.impact_parameters):
             if impact_param > 0:
-                redshift = physics_engine.redshift_factor(
+                redshift = physics_engine.calculate_redshift_factor(
                     self.radius, angle, inclination_rad, impact_param
                 )
                 self.redshift_factors.append(redshift)
