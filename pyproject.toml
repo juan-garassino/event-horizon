@@ -11,5 +11,16 @@ dependencies = [
   "rich>=12.0",
   "pyfiglet>=0.8",]
 
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
 [tool.uv]
 package = false
+
+[tool.pytest.ini_options]
+# The package is not installed (tool.uv.package = false), so put the repo root on sys.path.
+pythonpath = ["."]
+# Only collect the real suite; scripts/dev/ holds exploratory scripts (one calls sys.exit).
+testpaths = ["tests"]
+# Face-on (inclination 0) evaluates tan(theta_0)**-2 = inf inside the lambdified eq.13; numpy warns, the result is correct.
+filterwarnings = ["ignore:divide by zero encountered in scalar power:RuntimeWarning"]
