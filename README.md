@@ -238,7 +238,15 @@ eventHorizon/
 main.py             # CLI with Rich interactive menu
 references/         # Original luminet + bhsim reference implementations
 docs/               # Technical docs, tutorials, validation
-scripts/dev/        # Development and test scripts
+tests/              # pytest suite (physics checks against analytic values)
+scripts/dev/        # Exploratory development scripts (not collected by pytest)
+```
+
+### Tests
+
+```bash
+uv sync --extra dev
+uv run pytest -q
 ```
 
 ---

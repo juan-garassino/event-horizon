@@ -88,10 +88,33 @@ the code together interactively.
 - Observer distance: very far away (500+ units)
 
 ## Current status
-[ Fill in: what's working, what the image looks like so far if anything ]
+- Renders work end to end: `uv run python main.py --mode scatter -N 2000 --no-display` took about
+  1 min on CPU (2026-11-11; other modes in README).
+- Tests: `uv sync --extra dev && uv run pytest -q` (83 tests, about 12 s on CPU). pytest only
+  collects `tests/` (`[tool.pytest.ini_options]` in pyproject); `scripts/dev/` holds exploratory
+  scripts, not tests.
+- Covered: characteristic radii (2M, 3M, 6M) and b_c = 3√3 M; the sympy expressions for eq.13 / 15 / 19;
+  eq.13 impact parameters checked against an independent quadrature of the photon orbit equation;
+  vectorized vs exact solver agreement; face-on isoradials are circles; b(α) = b(2π − α) symmetry;
+  b ∝ M scaling; redshift limits (1/√(1−3M/r) without Doppler, √2 at the ISCO, → 1 far away,
+  approaching side blueshifted); Novikov-Thorne flux zero at/inside the ISCO and peaking at r ≈ 9.55M;
+  the `Isoradial` model and the lookup-table particle generator.
+- Not covered yet: rendering/plotting output, Kerr (spin is stubbed), and reference values read off
+  Luminet's figures (see docs/validation/scientific_validation.md § 3).
 
 ## File structure
-[ Fill in: e.g. "geodesic.py has the ray tracing, disk.py has the brightness math" ]
+- `eventHorizon/physics/geodesics.py` — sympy expressions for Luminet eq.13 / 15 / 19, the vectorized
+  periastron root finder (`fast_root`) and `impact_parameter`.
+- `eventHorizon/physics/disk_physics.py` — scalar redshift, intrinsic/observed flux and the exact
+  bisection eq.13 solver used by the contour handler.
+- `eventHorizon/physics/fast_geodesics.py` — lookup table b(α, r) plus vectorized redshift/flux for
+  the particle renderers.
+- `eventHorizon/math/` — older copy of `physics/geodesics.py` and `fast_geodesics.py` (still imported by
+  `core/isoradial_model.py`); fixes must be applied to both copies.
+- `eventHorizon/core/isoradial_model.py` — `Isoradial` (working); the isoredshift/grid/velocity
+  models there are stubs.
+- `eventHorizon/handlers/`, `visualization/`, `api.py` — render modes and the public API; `main.py` is the CLI.
+- `tests/` — pytest suite; `tests/conftest.py` holds the shared eq.13 objective and the quadrature helper.
 
 ## Branches
 The `lacague` branch is an incomplete OO refactor (stubbed physics) — archived, not
